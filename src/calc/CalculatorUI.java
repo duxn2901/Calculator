@@ -1,6 +1,8 @@
 package calc;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 
 import javax.swing.*;
@@ -13,13 +15,22 @@ public class CalculatorUI {
     private JTextField display;
     private JPanel buttonPanel;
 
-    private HashMap<String, JButton> operatorButtons;
-    private HashMap<String, JButton> numberButtons;
+    private HashMap<JButton, String> operatorButtons;
+    private HashMap<JButton, String> numberButtons;
     // private CalculatorLogic logic;
 
     private double firstOperand;
     private String operator;
     // private boolean startNewNumber;
+
+    //actionlistener for buttons
+    ActionListener numberListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String buttonText = numberButtons.get(e.getSource());
+            display.setText(display.getText() + buttonText);
+        }
+    };
 
     // Constructor
     public CalculatorUI() {
@@ -33,6 +44,7 @@ public class CalculatorUI {
         createDisplay();
         createButtonPanel();
         frame.setVisible(true);
+        attachNumberButtonListeners();
     }
 
     // Create the main frame
@@ -47,7 +59,7 @@ public class CalculatorUI {
     // Create the display field
     private void createDisplay() {
         // create JTextField for output
-        display = new JTextField("0");
+        display = new JTextField("");
         display.setEditable(false);
         display.setHorizontalAlignment(JTextField.RIGHT);
         display.setFont(new Font("Arial", Font.BOLD, 60));
@@ -67,8 +79,9 @@ public class CalculatorUI {
         createButtons();
         frame.add(buttonPanel, BorderLayout.CENTER);
     }
+    
 
-    // Create number buttons (0-9)
+    //create all buttons
     private void createButtons() {
         String[][] gridLabels = {
             {"%", "CE", "C", "DEL"},
@@ -83,14 +96,21 @@ public class CalculatorUI {
         for (String[] row : gridLabels) {
             for (String label : row) {
                 JButton button = new JButton(label);
+                
                 if (label.matches("\\d")) {
-                    numberButtons.put(label, button);
+                    numberButtons.put(button, label);
                 }
-                else operatorButtons.put(label, button);
+                else operatorButtons.put(button, label);
                 buttonPanel.add(button);
             }
         }
 
+    }
+
+    private void attachNumberButtonListeners() {
+        for (JButton button : numberButtons.keySet()) {
+            button.addActionListener(numberListener);
+        }
     }
 
     private void createNumberButtons() {
